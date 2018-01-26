@@ -3,8 +3,8 @@ title: API Reference
 
 language_tabs: # must be one of https://git.io/vQNgJ
   - shell
-  - ruby
   - python
+  - swift
   - javascript
 
 toc_footers:
@@ -19,146 +19,131 @@ search: true
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+Welcome to the Koïos Smart Insurance API! You can use our API to access the smart insurance app API endpoints, which
+provides information about our users and let's you push data to our servers.
 
-We have language bindings in Shell, Ruby, and Python! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+We have language bindings in Shell, Python, Swift and Javascript! You can view code examples in the dark area to the right, and you
+can switch the programming language of the examples with the tabs in the top right.
 
-This example API documentation page was created with [Slate](https://github.com/lord/slate). Feel free to edit it and use it as a base for your own API's documentation.
 
 # Authentication
 
-> To authorize, use this code:
+> Each requests to the server needs to be authenticated by the username and password of the user:
 
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
+```shell
+curl -H "Content-Type: application/json" -X POST
+  -d '{"username":"myUsername", "password":"myPassword"}'
+  http://localhost:5000/api/v1.0/verifyUser/
 ```
 
 ```python
-import kittn
+import requests, json
 
-api = kittn.authorize('meowmeowmeow')
+url = 'https:/localhost:5000/api/v1.0/verifyUser/'
+payload = {'username': 'myUsername', 'password': 'myPassword'}
+headers = {'content-type': 'application/json'}
+
+r = requests.post(url, data=json.dumps(payload), headers=headers)
 ```
 
-```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
+```swift
+
 ```
 
 ```javascript
-const kittn = require('kittn');
 
-let api = kittn.authorize('meowmeowmeow');
 ```
 
-> Make sure to replace `meowmeowmeow` with your API key.
+> Make sure to replace `username` and `password` with the user's credentials.
 
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
+This API uses the <code>username</code> and <code>password</code> to authenticate each requests to the server.
 
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
+Each requests are expected to contain a JSON body with the user's credentials that looks like this:
 
-`Authorization: meowmeowmeow`
+`{'username': 'myUsername', 'password': 'myPassword'}`
 
 <aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
+Make sure to include the <code>username</code> and <code>password</code> in the JSON body of all your requests to the server.
 </aside>
 
-# Kittens
+# Basic Data
 
-## Get All Kittens
+## Create New User
 
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
+```shell
+curl -H "Content-Type: application/json" -X POST -d
+  '{"username":"myUsername", "password":"myPassword"}'
+  http://localhost:5000/api/v1.0/newUser/
 ```
 
 ```python
-import kittn
+import requests, json
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
+url = 'https:/localhost:5000/api/v1.0/newUser/'
+payload = {"username":"myUsername", "password":"myPassword"}
+headers = {'content-type': 'application/json'}
+
+r = requests.post(url, data=json.dumps(payload), headers=headers)
 ```
 
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
+```swift
+
 ```
 
 ```javascript
-const kittn = require('kittn');
 
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
-[
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
-]
+{
+  "success": Boolean
+}
 ```
 
-This endpoint retrieves all kittens.
+This endpoint creates a new user.
 
 ### HTTP Request
 
-`GET http://example.com/api/kittens`
+`POST https:/localhost:5000/api/v1.0/newUser/`
 
 ### Query Parameters
 
 Parameter | Default | Description
 --------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
+username | None | Username of the user to create
+password | None | Password of the user to create
 
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
+<aside class="warning">
+The username and the password must respect the database guidelines.
 </aside>
 
-## Get a Specific Kitten
+## Get Basic User Data
 
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
+```shell
+curl -H "Content-Type: application/json" -X GET -d
+  '{"username":"myUsername", "password":"myPassword",
+  "fields": ["field 1", "field 2"]}'
+  http://localhost:5000/api/v1.0/getBasicData/
 ```
 
 ```python
-import kittn
+import requests, json
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
+url = 'https:/localhost:5000/api/v1.0/newUser/'
+payload = {"username":"myUsername", "password":"myPassword"}
+headers = {'content-type': 'application/json'}
+
+r = requests.post(url, data=json.dumps(payload), headers=headers)
 ```
 
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
+```swift
+
 ```
 
 ```javascript
-const kittn = require('kittn');
 
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
 ```
 
 > The above command returns JSON structured like this:
@@ -175,7 +160,7 @@ let max = api.kittens.get(2);
 
 This endpoint retrieves a specific kitten.
 
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
+<aside class="success">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
 
 ### HTTP Request
 
@@ -236,4 +221,5 @@ This endpoint deletes a specific kitten.
 Parameter | Description
 --------- | -----------
 ID | The ID of the kitten to delete
+
 
