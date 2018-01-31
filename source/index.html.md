@@ -25,6 +25,113 @@ provides information about our users and let's you push data to our servers.
 We have language bindings in Shell, Python, Swift and Javascript! You can view code examples in the dark area to the right, and you
 can switch the programming language of the examples with the tabs in the top right.
 
+# Database Architecture
+
+
+
+<aside class="warning">Make sure you read this section carefully!</aside>
+
+The API handles the interaction between 2 databases:
+
+- **Basic Data:** Contains all the data that does not come from other apps (e.g. Username, password, email, address, etc.)
+- **Raw Data:** Contains all the data that comes from other apps and/or sensors (e.g. Walking distance, house temperature, etc.)
+
+The following two tables list the acceptable format for each of these database.
+
+## Basic Data
+
+> An example of one row of the "basic data" DB is provided below:
+
+```json
+{
+  'id': "Ie78jke1ldf9QJ73Cdf23",
+  'username': "john@example.com",
+  'password': "2Q/pGLJcswuo0JWWoMSHXRvD1",
+  'first_name': "John",
+  'middle_name': None,
+  'last_name': "Doe",
+  'birthday': 665350493000,
+  'gender': "M",
+  'country': "CA",
+  'province': "QC",
+  'city': "montreal",
+  'postal_code': "H1M 3K5",
+  'street_name': "example street",
+  'house_number': 235,
+  'geolocation': None,
+  'currency': "CAD",
+  'quotes': None,
+  'relationships': [
+                      {'friend_id': "E7tHV8wSfv7tmczQZ"}
+                   ],
+  'products': [
+                {
+                  'product_name': "Vision Death Insurance",
+                  'product_id': "LJcswDRkZPHZWCk8Q",
+                  'insurer_name': "Desjardins",
+                  'insurer_id': "JWWoMSHXRvD",
+                  'price': 345.32,
+                  'payment_frequency': "monthly",
+                  'insureds': [
+                                        {
+                                          'first_name': "Jr.",
+                                          'last_name': "Doe"
+                                          'email': "jr@example.com"
+                                        }
+                                     ],
+                  'monetary_attr': [
+                                      {
+                                        'attribute_name': "Medical Payments",
+                                        'attribute_id': "NJtNRargNcXCx",
+                                        'covered_amount': 2000.00,
+                                      }
+                                   ],
+                  'qualitative_attr': [
+                                        {
+                                          'attribute_name': "Critical Illness Insurance",
+                                          'attribute_id': "gb6ZFZpyGilDd",
+                                          'covered': True
+                                        }
+                                      ]
+
+                }
+              ]
+}
+```
+
+
+
+Field | Value| Description
+--------- | ------- | -----------
+id | varchar(254) | User's unique id
+username | varchar(254) | User's email
+password | varchar(254) | User's hashed password
+first_name | varchar(50) | User's first name
+middle_name | varchar(50) | User's middle name
+last_name | varchar(50) | User's last name
+birthday | varchar(254) | milliseconds UNIX timestamp
+gender | varchar(1) | M or F
+country | varchar(2) | Country abbreviation
+province | varchar(2) | Province abbreviation
+city | varchar(50) | City
+postal_code | varchar(50) | Postal code
+street_name | varchar(50) | Street name
+house_number | varchar(50) | House number
+geolocation | varchar(100) | Google Map's geolocation
+currency | varchar(10) | Currency used by the user
+relationships | JSON | ids of the user's friend using the app
+products | JSON | List of all the user's products characteristics
+quotes | JSON | List of all the user's quotes characteristics
+product_name | varchar(50) | Name of the insurance product
+product_id | varchar(50) | id of the insurance product
+insurer_name | varchar(50) | Name of the insurer
+insurer_id | varchar(50) | id of the insurer
+price | real | Price of the product/quote
+payment_frequency | varchar(25) | Weekly, monthly, etc.
+insureds | JSON | List of the insureds for the product/quote
+monetary_attr | JSON | List of the monetary attributes for the product/quote
+qualitative_attr | JSON | List of the qualitative attributes for the product/quote
+
 
 # Authentication
 
@@ -66,7 +173,7 @@ Each requests are expected to contain a JSON body with the user's credentials th
 Make sure to include the <code>username</code> and <code>password</code> in the JSON body of all your requests to the server.
 </aside>
 
-# Basic Data
+# API Endpoints
 
 ## Create New User
 
@@ -131,8 +238,70 @@ curl -H "Content-Type: application/json" -X GET -d
 ```python
 import requests, json
 
-url = 'https:/localhost:5000/api/v1.0/newUser/'
-payload = {"username":"myUsername", "password":"myPassword"}
+url = 'https:/localhost:5000/api/v1.0/getBasicData/'
+payload = {"username":"myUsername", "password":"myPassword",
+           "fields": ["field 1", ..., "field n"]}
+headers = {'content-type': 'application/json'}
+
+r = requests.get(url, data=json.dumps(payload), headers=headers)
+```
+
+```swift
+
+```
+
+```javascript
+
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+    "success": Boolean,
+    "data": [
+        "field 1": 'value 1',
+                ...,
+        "field n": 'value n'
+    ]
+}
+```
+
+This endpoint retrieves specific user information in the "basic data" database.
+
+### HTTP Request
+
+`GET https:/localhost:5000/api/v1.0/getBasicData/`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+username | Username of the user
+password | Password of the user
+fields   | Fields of the value you wish to retrieve
+
+
+
+
+
+## Update Basic User Data
+
+```shell
+curl -H "Content-Type: application/json" -X POST -d
+  '{"username":"myUsername", "password":"myPassword",
+  "fields": ["field 1", "field 2"],
+  "values": ["value 1", "value 2"]}'
+  http://localhost:5000/api/v1.0/updateBasicData/
+```
+
+```python
+import requests, json
+
+url = 'https:/localhost:5000/api/v1.0/updateBasicData/'
+payload = {"username":"myUsername", "password":"myPassword",
+           "fields": ["field 1", ..., "field n"],
+           "values": ["value 1", ..., "value n"]}
 headers = {'content-type': 'application/json'}
 
 r = requests.post(url, data=json.dumps(payload), headers=headers)
@@ -150,76 +319,79 @@ r = requests.post(url, data=json.dumps(payload), headers=headers)
 
 ```json
 {
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
+    "success": Boolean,
 }
 ```
 
-This endpoint retrieves a specific kitten.
-
-<aside class="success">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
+This endpoint updates specific user information in the "basic data" database.
 
 ### HTTP Request
 
-`GET http://example.com/kittens/<ID>`
+`POST https:/localhost:5000/api/v1.0/updateBasicData/`
 
 ### URL Parameters
 
 Parameter | Description
 --------- | -----------
-ID | The ID of the kitten to retrieve
+username | Username of the user
+password | Password of the user
+fields   | Fields of the value you wish to update
+values   | Values of the fields
 
-## Delete a Specific Kitten
 
-```ruby
-require 'kittn'
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
+
+
+## Update Raw User Data
+
+```shell
+curl -H "Content-Type: application/json" -X POST -d
+  '{"username":"myUsername", "password":"myPassword",
+  "fields": ["field 1", "field 2"],
+  "values": ["value 1", "value 2"]}'
+  http://localhost:5000/api/v1.0/updateRawData/
 ```
 
 ```python
-import kittn
+import requests, json
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
+url = 'https:/localhost:5000/api/v1.0/updateBasicData/'
+payload = {"username":"myUsername", "password":"myPassword",
+           "fields": ["field 1", ..., "field n"],
+           "values": ["value 1", ..., "value n"]}
+headers = {'content-type': 'application/json'}
+
+r = requests.post(url, data=json.dumps(payload), headers=headers)
 ```
 
-```shell
-curl "http://example.com/api/kittens/2"
-  -X DELETE
-  -H "Authorization: meowmeowmeow"
+```swift
+
 ```
 
 ```javascript
-const kittn = require('kittn');
 
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-  "id": 2,
-  "deleted" : ":("
+    "success": Boolean,
 }
 ```
 
-This endpoint deletes a specific kitten.
+This endpoint updates specific user information in the "raw data" database.
 
 ### HTTP Request
 
-`DELETE http://example.com/kittens/<ID>`
+`POST https:/localhost:5000/api/v1.0/updateRawData/`
 
 ### URL Parameters
 
 Parameter | Description
 --------- | -----------
-ID | The ID of the kitten to delete
-
+username | Username of the user
+password | Password of the user
+fields   | Fields of the value you wish to update
+values   | Values of the fields
 
