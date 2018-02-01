@@ -33,10 +33,59 @@ can switch the programming language of the examples with the tabs in the top rig
 
 The API handles the interaction between 2 databases:
 
-- **Basic Data:** Contains all the data that does not come from other apps (e.g. Username, password, email, address, etc.)
-- **Raw Data:** Contains all the data that comes from other apps and/or sensors (e.g. Walking distance, house temperature, etc.)
+- **InsurerData**: Contains all the data for the insurer's and the products they offer
+- **Basic User's Data:** Contains all the data that does not come from other apps (e.g. Username, password, email, address, etc.)
+- **Raw User's Data:** Contains all the data that comes from other apps and/or sensors (e.g. Walking distance, house temperature, etc.)
 
 The following two tables list the acceptable format for each of these database.
+
+## InsurerData
+
+> An example of one row of the "insurerData" DB is provided below:
+
+```json
+{
+  'insurer_name': "Desjardins",
+  'insurer_id': "JWWoMSHXRvD",
+  'products': [
+                {
+                  'product_name': 'Vision Death Insurance',
+                  'product_id': "LJcswDRkZPHZWCk8Q",
+                  'pricing_method': "linearRegression",
+                  'pricing_method_id': "swDRkZPHZWCk",
+                  'pricing_method_data': ["is_smoker", "birthday", ...]
+                  'monetary_attr': [
+                                      {
+                                        'attribute_name': "Medical Payments",
+                                        'attribute_id': "NJtNRargNcXCx",
+                                      }
+                                   ]
+                  'qualitative_attr': [
+                                        {
+                                          'attribute_name': "Critical Illness Insurance",
+                                          'attribute_id': "gb6ZFZpyGilDd",
+                                        }
+                                      ],
+                }
+              ]
+}
+```
+
+Field | Value| Description
+--------- | ------- | -----------
+insurer_name | varchar(254) | Insurer's name
+insurer_id | varchar(254) | Insurer's unique id
+products | JSON | List of all the products for the insurer
+product_name | varchar(254) | Product's name
+product_id | varchar(254) | Product's id
+pricing_method | varchar(254) | Name of the algorithm for the product's pricing
+pricing_method_id | varchar(254) | id of the pricing method
+pricing_method_data | JSON | List of the variables used for the pricing
+monetary_attr | JSON | List of the monetary attributes for this product
+qualitative_attr | JSON | List of the qualitative attributes for this product
+attribute_name | varchar(50) | Name of the attribute for the product
+attribute_id | varchar(50) | id of the attribute
+
 
 ## Basic Data
 
