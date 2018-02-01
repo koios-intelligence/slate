@@ -27,11 +27,9 @@ can switch the programming language of the examples with the tabs in the top rig
 
 # Database Architecture
 
-
-
 <aside class="warning">Make sure you read this section carefully!</aside>
 
-The API handles the interaction between 2 databases:
+The API handles the interaction between 3 databases:
 
 - <code>InsurerData</code>: Contains all the data for the insurer's and the products they offer
 - <code>basicUserData</code>: Contains all the data that does not come from other apps (e.g. Username, password, email, address, etc.)
@@ -89,6 +87,12 @@ attribute_id | varchar(50) | id of the attribute
 
 
 ## basicUserData Database
+
+<aside class="success">
+Keep in mind that it is not possible to fetch one specific product, quote or
+relationship. Instead, you should get the whole <code>products</code> and get rid
+of useless data manually.
+</aside>
 
 > An example of one row of the "basic data" DB is provided below:
 
@@ -148,8 +152,6 @@ attribute_id | varchar(50) | id of the attribute
               ]
 }
 ```
-
-
 
 Field | Value| Description
 --------- | ------- | -----------
@@ -317,7 +319,7 @@ r = requests.get(url, data=json.dumps(payload), headers=headers)
 }
 ```
 
-This endpoint retrieves specific user information in the "basic data" database.
+This endpoint retrieves specific user information in the <code>basicUserData</code> database.
 
 ### HTTP Request
 
@@ -330,8 +332,6 @@ Parameter | Description
 username | Username of the user
 password | Password of the user
 fields   | Fields of the value you wish to retrieve
-
-
 
 
 
@@ -373,7 +373,7 @@ r = requests.post(url, data=json.dumps(payload), headers=headers)
 }
 ```
 
-This endpoint updates specific user information in the "basic data" database.
+This endpoint updates specific user information in the <code>basicUserData</code> database.
 
 ### HTTP Request
 
@@ -430,7 +430,7 @@ r = requests.post(url, data=json.dumps(payload), headers=headers)
 }
 ```
 
-This endpoint updates specific user information in the "raw data" database.
+This endpoint updates specific user information in the <code>rawUserData</code> database.
 
 ### HTTP Request
 
@@ -444,4 +444,61 @@ username | Username of the user
 password | Password of the user
 fields   | Fields of the value you wish to update
 values   | Values of the fields
+
+
+
+## Get Insurer's Data
+
+```shell
+curl -H "Content-Type: application/json" -X GET -d
+  '{"username":"myUsername", "password":"myPassword",
+  "fields": ["field 1", "field 2"]'
+  http://localhost:5000/api/v1.0/getInsurerData/
+```
+
+```python
+import requests, json
+
+url = 'https:/localhost:5000/api/v1.0/getInsurerData/'
+payload = {"username":"myUsername", "password":"myPassword",
+           "fields": ["field 1", ..., "field n"]}
+headers = {'content-type': 'application/json'}
+
+r = requests.post(url, data=json.dumps(payload), headers=headers)
+```
+
+```swift
+
+```
+
+```javascript
+
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+    "success": Boolean,
+    "data": [
+        "field 1": 'value 1',
+                ...,
+        "field n": 'value n'
+    ]
+}
+```
+
+This endpoint fetches specific information in the <code>insurerData</code> database.
+
+### HTTP Request
+
+`GET https:/localhost:5000/api/v1.0/getInsurerData/`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+username | Username of the user
+password | Password of the user
+fields   | Fields of the value you wish to fetch
 
