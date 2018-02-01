@@ -33,13 +33,13 @@ can switch the programming language of the examples with the tabs in the top rig
 
 The API handles the interaction between 2 databases:
 
-- **InsurerData**: Contains all the data for the insurer's and the products they offer
-- **Basic User's Data:** Contains all the data that does not come from other apps (e.g. Username, password, email, address, etc.)
-- **Raw User's Data:** Contains all the data that comes from other apps and/or sensors (e.g. Walking distance, house temperature, etc.)
+- <code>InsurerData</code>: Contains all the data for the insurer's and the products they offer
+- <code>basicUserData</code>: Contains all the data that does not come from other apps (e.g. Username, password, email, address, etc.)
+- <code>rawUserData</code>: Contains all the data that comes from other apps and/or sensors (e.g. Walking distance, house temperature, etc.)
 
 The following two tables list the acceptable format for each of these database.
 
-## InsurerData
+## InsurerData Database
 
 > An example of one row of the "insurerData" DB is provided below:
 
@@ -87,7 +87,7 @@ attribute_name | varchar(50) | Name of the attribute for the product
 attribute_id | varchar(50) | id of the attribute
 
 
-## Basic Data
+## basicUserData Database
 
 > An example of one row of the "basic data" DB is provided below:
 
