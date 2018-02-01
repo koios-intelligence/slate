@@ -58,6 +58,7 @@ The following two tables list the acceptable format for each of these database.
                                       {
                                         'attribute_name': "Medical Payments",
                                         'attribute_id': "NJtNRargNcXCx",
+                                        'attribute_values': [1000, 2000, ...],
                                       }
                                    ]
                   'qualitative_attr': [
