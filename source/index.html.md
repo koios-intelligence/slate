@@ -29,15 +29,62 @@ can switch the programming language of the examples with the tabs in the top rig
 
 <aside class="warning">Make sure you read this section carefully!</aside>
 
-The API handles the interaction between 3 databases:
+The API handles the interaction between 4 databases:
 
-- <code>InsurerData</code>: Contains all the data for the insurer's and the products they offer
+- <code>productData</code>: Contains all the data for the products
+- <code>insurerData</code>: Contains all the data for the insurers
 - <code>basicUserData</code>: Contains all the data that does not come from other apps (e.g. Username, password, email, address, etc.)
 - <code>rawUserData</code>: Contains all the data that comes from other apps and/or sensors (e.g. Walking distance, house temperature, etc.)
 
 The following two tables list the acceptable format for each of these database.
 
-## InsurerData Database
+## productData Database
+
+> An example of one row of the "productData" DB is provided below:
+
+```json
+{
+  'product_name': "Vision Death Insurance",
+  'product_id': "LJcswDRkZPHZWCk8Q",
+  'product_rating': 4.73,
+  'insurer': "Desjardins"
+  'product_desc': "Provides you with life insurance for a set period",
+  'pricing_method': "linearRegression",
+  'pricing_method_id': "swDRkZPHZWCk",
+  'pricing_method_data': ["is_smoker", "birthday", ...]
+  'monetary_attr': [
+                      {
+                        'attribute_name': "Medical Payments",
+                        'attribute_id': "NJtNRargNcXCx",
+                        'attribute_values': [1000, 2000, ...],
+                      }
+                   ]
+  'qualitative_attr': [
+                        {
+                          'attribute_name': "Critical Illness Insurance",
+                          'attribute_id': "gb6ZFZpyGilDd",
+                        }
+                      ],
+}
+```
+
+Field | Value| Description
+--------- | ------- | -----------
+product_name | varchar(254) | Product's name
+product_id | varchar(254) | Product's id
+product_rating | varchar(10) | Product's rating
+product_desc | varchar(254) | Product's description
+insurer | varchar(50) | Insurer who offer the product
+pricing_method | varchar(254) | Name of the algorithm for the product's pricing
+pricing_method_id | varchar(254) | id of the pricing method
+pricing_method_data | JSON | List of the variables used for the pricing
+monetary_attr | JSON | List of the monetary attributes for this product
+qualitative_attr | JSON | List of the qualitative attributes for this product
+attribute_name | varchar(50) | Name of the attribute for the product
+attribute_id | varchar(50) | id of the attribute
+
+
+## insurerData Database
 
 > An example of one row of the "insurerData" DB is provided below:
 
@@ -45,27 +92,13 @@ The following two tables list the acceptable format for each of these database.
 {
   'insurer_name': "Desjardins",
   'insurer_id': "JWWoMSHXRvD",
+  'insurer_desc': "The Desjardins Group is the largest
+                   association of credit unions in
+                   North America",
+  'insurer_rating': 4.32,
   'products': [
-                {
-                  'product_name': 'Vision Death Insurance',
-                  'product_id': "LJcswDRkZPHZWCk8Q",
-                  'pricing_method': "linearRegression",
-                  'pricing_method_id': "swDRkZPHZWCk",
-                  'pricing_method_data': ["is_smoker", "birthday", ...]
-                  'monetary_attr': [
-                                      {
-                                        'attribute_name': "Medical Payments",
-                                        'attribute_id': "NJtNRargNcXCx",
-                                        'attribute_values': [1000, 2000, ...],
-                                      }
-                                   ]
-                  'qualitative_attr': [
-                                        {
-                                          'attribute_name': "Critical Illness Insurance",
-                                          'attribute_id': "gb6ZFZpyGilDd",
-                                        }
-                                      ],
-                }
+                {'product_id': "LJcswDRkZPHZWCk8Q"},
+                {'product_id': "MRfkZ4PHZWCk862dD"}
               ]
 }
 ```
@@ -74,16 +107,9 @@ Field | Value| Description
 --------- | ------- | -----------
 insurer_name | varchar(254) | Insurer's name
 insurer_id | varchar(254) | Insurer's unique id
-products | JSON | List of all the products for the insurer
-product_name | varchar(254) | Product's name
-product_id | varchar(254) | Product's id
-pricing_method | varchar(254) | Name of the algorithm for the product's pricing
-pricing_method_id | varchar(254) | id of the pricing method
-pricing_method_data | JSON | List of the variables used for the pricing
-monetary_attr | JSON | List of the monetary attributes for this product
-qualitative_attr | JSON | List of the qualitative attributes for this product
-attribute_name | varchar(50) | Name of the attribute for the product
-attribute_id | varchar(50) | id of the attribute
+products | JSON | List of all the products of the insurer
+insurer_desc | varchar(254) | Description of the insurer
+insurer_rating | varchar(10) | Insurer's rating
 
 
 ## basicUserData Database
@@ -283,7 +309,7 @@ The username and the password must respect the database guidelines.
 ```shell
 curl -H "Content-Type: application/json" -X GET -d
   '{"username":"myUsername", "password":"myPassword",
-  "fields": ["field 1", "field 2"]}'
+    "fields": ["field 1", "field 2"]}'
   http://localhost:5000/api/v1.0/getBasicData/
 ```
 
@@ -340,8 +366,8 @@ fields   | Fields of the value you wish to retrieve
 ```shell
 curl -H "Content-Type: application/json" -X POST -d
   '{"username":"myUsername", "password":"myPassword",
-  "fields": ["field 1", "field 2"],
-  "values": ["value 1", "value 2"]}'
+    "fields": ["field 1", "field 2"],
+    "values": ["value 1", "value 2"]}'
   http://localhost:5000/api/v1.0/updateBasicData/
 ```
 
@@ -389,16 +415,13 @@ fields   | Fields of the value you wish to update
 values   | Values of the fields
 
 
-
-
-
 ## Update Raw User Data
 
 ```shell
 curl -H "Content-Type: application/json" -X POST -d
   '{"username":"myUsername", "password":"myPassword",
-  "fields": ["field 1", "field 2"],
-  "values": ["value 1", "value 2"]}'
+    "fields": ["field 1", "field 2"],
+    "values": ["value 1", "value 2"]}'
   http://localhost:5000/api/v1.0/updateRawData/
 ```
 
@@ -452,7 +475,7 @@ values   | Values of the fields
 ```shell
 curl -H "Content-Type: application/json" -X GET -d
   '{"username":"myUsername", "password":"myPassword",
-  "fields": ["field 1", "field 2"]'
+    "insurer_id": "test", "fields": ["field 1", "field 2"]}'
   http://localhost:5000/api/v1.0/getInsurerData/
 ```
 
@@ -461,7 +484,7 @@ import requests, json
 
 url = 'https:/localhost:5000/api/v1.0/getInsurerData/'
 payload = {"username":"myUsername", "password":"myPassword",
-           "fields": ["field 1", ..., "field n"]}
+           "insurer_id": "test", "fields": ["field 1", ..., "field n"]}
 headers = {'content-type': 'application/json'}
 
 r = requests.post(url, data=json.dumps(payload), headers=headers)
@@ -500,5 +523,68 @@ Parameter | Description
 --------- | -----------
 username | Username of the user
 password | Password of the user
+insurer_id | id of the insurer
 fields   | Fields of the value you wish to fetch
+
+
+
+
+
+
+## Get Product's Data
+
+```shell
+curl -H "Content-Type: application/json" -X GET -d
+  '{"username":"myUsername", "password":"myPassword",
+    "product_id": "test", "fields": ["field 1", "field 2"]}'
+  http://localhost:5000/api/v1.0/getProductData/
+```
+
+```python
+import requests, json
+
+url = 'https:/localhost:5000/api/v1.0/getProductData/'
+payload = {"username":"myUsername", "password":"myPassword",
+           "product_id": "test", "fields": ["field 1", ..., "field n"]}
+headers = {'content-type': 'application/json'}
+
+r = requests.post(url, data=json.dumps(payload), headers=headers)
+```
+
+```swift
+
+```
+
+```javascript
+
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+    "success": Boolean,
+    "data": [
+        "field 1": 'value 1',
+                ...,
+        "field n": 'value n'
+    ]
+}
+```
+
+This endpoint fetches specific information in the <code>productData</code> database.
+
+### HTTP Request
+
+`GET https:/localhost:5000/api/v1.0/getProductData/`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+username | Username of the user
+password | Password of the user
+product_id | id of the insurer
+fields   | Fields of the value you wish to fetch
+                          
 
